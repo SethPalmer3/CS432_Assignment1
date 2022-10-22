@@ -1,6 +1,7 @@
 #include "duckchat.h"
 #include "connection_handler.h"
 #include "channels.h"
+#include "helper_functions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,41 +13,6 @@
 
 #define MAX_CONNECTIONS 10
 #define PORT 8000
-
-Channel *find_channel(Channel **chnls, int chnls_len, char* channel_name){
-    for (int i = 0; i < chnls_len; i++)
-    {
-        if (strcmp(chnls[i]->chnl_name, channel_name) == 0)
-        {
-            return chnls[i];
-        }
-        
-    }
-    return NULL;
-}
-
-User *find_user(User **usrs, int usrs_len, struct sockaddr_in addr, int *position){
-    for (int i = 0; i < usrs_len; i++)
-    {
-        if (comp_sockaddr(usrs[i]->address, addr))
-        {
-            if (position != NULL)
-            {
-                *position = i;
-            }
-            
-            return usrs[i];
-        }
-        
-    }
-    return NULL;
-}
-
-Channel *add_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
-    Channel *chnl = create_channel(chnl_name);
-    chnls[(*num_chnls)++] = chnl;
-    return chnl;
-}
 
 int main(){
     struct sockaddr_in client_addr;
@@ -160,22 +126,7 @@ int main(){
             chnl->remove_user(chnl, usr->username);
             if (chnl->num_users == 0)
             {
-                int move = 0;
-                for (int i = 0; i < num_chnnls; i++)
-                {
-                    if (move)
-                    {
-                        channels[i-1] = channels[i];
-                    }else if(strcmp(channels[i]->chnl_name, chnl->chnl_name) == 0){
-                        move = 1;
-                        printf("Destroyed channel\n");
-                        chnl->destroy(chnl);
-                        
-                    }
-                    
-                }
-                num_chnnls--;
-                
+               remove_chnl(channels, &num_chnnls, chnl->chnl_name);
             }
         }break;
         case REQ_LOGOUT:{

@@ -42,4 +42,16 @@ int send_leave_req(int socketfd, struct sockaddr_in *s_addr, int len, char *buff
 // Send a logout request
 int send_logout_req(int socketfd, struct sockaddr_in *s_addr, int len);
 
+// Finds a channel_name within a list of channels
+Channel *find_channel(Channel **chnls, int chnls_len, char* channel_name);
+
+// Finds a user by its address in a list of users
+User *find_user(User **usrs, int usrs_len, struct sockaddr_in addr, int *position);
+
+// Adds a channel of name chnl_name into a list of channels
+Channel *add_chnl(Channel **chnls, int *num_chnls, char *chnl_name);
+
+// Removes a channel from a list of channels
+Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name);
+
 #endif

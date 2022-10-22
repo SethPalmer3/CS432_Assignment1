@@ -177,3 +177,58 @@ int send_logout_req(int socketfd, struct sockaddr_in *s_addr, int len){
     }
     return 1;
 }
+
+Channel *find_channel(Channel **chnls, int chnls_len, char* channel_name){
+    for (int i = 0; i < chnls_len; i++)
+    {
+        if (strcmp(chnls[i]->chnl_name, channel_name) == 0)
+        {
+            return chnls[i];
+        }
+        
+    }
+    return NULL;
+}
+
+User *find_user(User **usrs, int usrs_len, struct sockaddr_in addr, int *position){
+    for (int i = 0; i < usrs_len; i++)
+    {
+        if (comp_sockaddr(usrs[i]->address, addr))
+        {
+            if (position != NULL)
+            {
+                *position = i;
+            }
+            
+            return usrs[i];
+        }
+        
+    }
+    return NULL;
+}
+
+Channel *add_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
+    Channel *chnl = create_channel(chnl_name);
+    chnls[(*num_chnls)++] = chnl;
+    return chnl;
+}
+
+Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
+    Channel *chnl;
+    int move = 0;
+    for (int i = 0; i < *num_chnls; i++)
+    {
+        if (move)
+        {
+            chnls[i-1] = chnls[i];
+        }else if(strcmp(chnls[i]->chnl_name, chnl_name) == 0){
+            chnl = chnls[i];
+            move = 1;
+            printf("Destroyed channel\n");
+        }
+        
+    }
+    *num_chnls -= 1;
+    return chnl;
+
+}
