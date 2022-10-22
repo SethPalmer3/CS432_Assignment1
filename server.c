@@ -110,10 +110,13 @@ int main(int argc, char **argv){
             {
                 free(who);
                 printf("Not a real channel\n");
-                //TODO: send and error datagram to client
                 struct text_error te;
+                memset(&te, 0, sizeof(te));
                 te.txt_type = TXT_ERROR;
-                strcpy(te.txt_error, "This channel doesn't exist");
+                strcpy(te.txt_error, "Channel \"");
+                strcat(te.txt_error, re_who->req_channel);
+                strcat(te.txt_error, "\" does not exist");
+                ch->socket_send(ch, &te, sizeof(te), &client_addr);
                 continue;
             }
             
