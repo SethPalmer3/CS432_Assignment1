@@ -14,7 +14,13 @@
 #define MAX_CONNECTIONS 10
 #define PORT 8000
 
-int main(){
+int main(int argc, char **argv){
+    if (argc < 2)
+    {
+        printf("Too few arguments\n");
+        exit(EXIT_FAILURE);
+    }
+    
     struct sockaddr_in client_addr;
     unsigned int client_addrlen = sizeof(client_addr);
     Connection_Handler *ch = create_handler();
@@ -29,7 +35,7 @@ int main(){
 
     memset(&client_addr, 0, sizeof(client_addr));
 
-    ch->init_socket(ch, PORT);
+    ch->init_socket(ch, argv[1], (uint16_t)atoi(argv[2]));
 
     struct request *rq;
 

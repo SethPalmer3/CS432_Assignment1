@@ -182,7 +182,7 @@ int main(int argc, char **argv){
     //unsigned int server_addrlen;
 
     Connection_Handler *c = create_handler();
-    c->init_socket(c, 0);
+    c->init_socket(c, NULL, 0);
 
     memset(&server_addr, 0, sizeof(server_addr));
 

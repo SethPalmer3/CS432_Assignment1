@@ -11,7 +11,7 @@
 #include <fcntl.h>
 
 
-void init_socket(Connection_Handler* ch, uint16_t port){
+void init_socket(Connection_Handler* ch, char *addr, uint16_t port){
     Self *s = (Self *)ch->self;
     if((s->socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
         printf("Could not create socket\n");
@@ -27,7 +27,14 @@ void init_socket(Connection_Handler* ch, uint16_t port){
     s->port = port;
 
     s->addr.sin_family = AF_INET;
-    s->addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if (addr == NULL)
+    {
+        /* code */
+        s->addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    }else{
+        inet_pton(AF_INET, addr, &(s->addr.sin_addr));
+    }
+    
     s->addr.sin_port = htons(port);
     
     s->addrlen = sizeof(s->addr);
