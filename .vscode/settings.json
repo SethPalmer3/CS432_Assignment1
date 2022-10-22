@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "pthread.h": "c",
+        "cstdlib": "c"
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
+}
