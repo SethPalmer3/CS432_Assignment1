@@ -132,6 +132,20 @@ int main(int argc, char **argv){
         case REQ_LEAVE:{
             struct request_leave *req_l = (struct request_leave *)rq;
             Channel *chnl = find_channel(channels, num_chnnls,req_l->req_channel);
+            if (chnl == NULL)
+            {
+                // Send Error report
+                printf("Not a real channel\n");
+                struct text_error terr;
+                memset(&terr, 0, sizeof(terr));
+                terr.txt_type = TXT_ERROR;
+                strcpy(terr.txt_error, "The channel \"");
+                strcat(terr.txt_error, req_l->req_channel);
+                strcat(terr.txt_error, "\" does not exist");
+                ch->socket_send(ch, &terr, sizeof(terr), &client_addr);
+                continue;
+            }
+            
             User *usr = find_user(all_users, num_users, client_addr, NULL);
             chnl->remove_user(chnl, usr->username);
             if (chnl->num_users == 0)
