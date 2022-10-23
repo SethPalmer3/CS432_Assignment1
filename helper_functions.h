@@ -55,7 +55,5 @@ Channel *add_chnl(Channel **chnls, int *num_chnls, char *chnl_name);
 // Removes a channel from a list of channels
 Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name);
 
-// Finds by the search param using the cmp function and moves the remaining entries down
-void *remove_shift(void *list[], int *list_len, int (*cmp)(void*, void*), void *search);
 
 #endif

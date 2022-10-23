@@ -199,10 +199,8 @@ User *find_user(User **usrs, int usrs_len, struct sockaddr_in addr, int *positio
             {
                 *position = i;
             }
-            
             return usrs[i];
         }
-        
     }
     return NULL;
 }
@@ -216,11 +214,13 @@ Channel *add_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
 Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
     Channel *chnl;
     int move = 0;
-    for (int i = 0; i < *num_chnls; i++)
+    int i;
+    for (i = 0; i < *num_chnls; i++)
     {
         if (move)
         {
             chnls[i-1] = chnls[i];
+
         }else if(strcmp(chnls[i]->chnl_name, chnl_name) == 0){
             chnl = chnls[i];
             move = 1;
@@ -228,30 +228,8 @@ Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
         }
         
     }
+    chnls[i] = NULL;
     *num_chnls -= 1;
     return chnl;
 
-}
-
-void *remove_shift(void *list[], int *list_len, int (*cmp)(void *, void*), void *search){
-    int move = 0;
-    void *ret = NULL;
-    for (int i = 0; i < *list_len; i++)
-    {
-        if (move)
-        {
-            list[i-1] = list[i];
-            list[i] = NULL;
-        }else if (cmp(list[i], search))
-        {
-            move = 1;
-            ret = list[i];
-            list[i] = NULL;
-        }
-    }
-    if (move)
-    {
-        *list_len -= 1;
-    }
-    return ret;
 }

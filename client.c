@@ -137,12 +137,30 @@ void *send_thread(void *args){
             char chnl[CHANNEL_MAX];
             int chnl_len;
             strcpy(chnl, get_command_arg(buff, &chnl_len));
-            void *leave_chnl = remove_shift((void **)joined_chnls, &joined_len, cmp, (void *)chnl);
-            if (leave_chnl == NULL)
+            int move = 0;
+            char leave_chnl[CHANNEL_MAX];
+            int i;
+            for (i = 0; i < joined_len; i++)
+            {
+                if (move)
+                {
+                    strcpy(joined_chnls[i-1], joined_chnls[i]); // move entries down
+                }else if (cmp((void*)joined_chnls[i], (void*) chnl))
+                {
+                    move = 1;
+                    strcpy(leave_chnl, joined_chnls[i]);
+                }
+            }
+            if (move == 1) // check if we actually found the channel
+            {
+                joined_len -= 1;
+            }
+
+            if (move == 0)
             {
                 clear_stdout(50);
                 write(STDOUT_FILENO, "You have not already join ", 26);
-                write(STDOUT_FILENO, (char *)leave_chnl, CHANNEL_MAX);
+                write(STDOUT_FILENO, (char *)chnl, CHANNEL_MAX);
                 write(STDOUT_FILENO, " to leave it", 12);
 
             }else{
@@ -153,7 +171,23 @@ void *send_thread(void *args){
         case REQ_SWITCH:{
             int chnl_len;
             char *chnl = get_command_arg(buff, &chnl_len);
-            strncpy(active_channel, chnl, chnl_len);
+            int found = 0;
+            for (int i = 0; i < joined_len; i++)
+            {
+                if (strcmp(joined_chnls[i], chnl) == 0)
+                {
+                    strcpy(active_channel, joined_chnls[i]);
+                    found = 1;
+
+                }
+            }
+            if (!found)
+            {
+                clear_stdout(50);
+                write(STDOUT_FILENO, "You have not joined ", 20);
+                write(STDOUT_FILENO, chnl, chnl_len);
+                write(STDOUT_FILENO, " to switch to in \n", 17);
+            }
         }break;
         case REQ_LOGOUT:{
             send_logout_req(a->socketfd, &a->server, len);
