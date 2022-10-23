@@ -30,6 +30,7 @@ void *recv_thread(void *args){
     unsigned int len = sizeof(a->server);
     while (!logout)
     {
+        memset(buff, 0, BUFSIZ * sizeof(char));
         if(recvfrom(a->socketfd, buff, BUFSIZ, MSG_DONTWAIT, (struct sockaddr *)&(a->server), &len) >= 0){
             struct text *t = (struct text*) buff;
             pthread_mutex_lock(&lock);

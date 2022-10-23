@@ -103,6 +103,7 @@ int main(int argc, char **argv){
             struct request_who *re_who = (struct request_who *)rq;
             int who_len = sizeof(struct request_who) + num_users * sizeof(struct user_info);
             struct text_who *who = (struct text_who *)malloc(who_len);
+            memset(who, 0, who_len);
             who->txt_type = TXT_WHO; // Set type
             strcpy(who->txt_channel, re_who->req_channel); // Get channel
             Channel *chnl = find_channel(channels, num_chnnls, re_who->req_channel); // Get channel for who req
