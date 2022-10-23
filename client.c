@@ -19,6 +19,12 @@ pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 volatile int writing = 0;
 volatile int logout = 0;
 
+int cmp(void *cmp1, void *cmp2){
+    char *chnl_name = (char *)cmp1;
+    char *want_name = (char *)cmp2;
+    return strcmp(chnl_name, want_name) == 0;
+}
+
 struct pargs{
     int socketfd;
     struct sockaddr_in server;
@@ -81,8 +87,11 @@ void *recv_thread(void *args){
 void *send_thread(void *args){
     struct pargs *a = (struct pargs *)args;
     char *buff = (char *)malloc(BUFSIZ * sizeof(char));
+    char joined_chnls[MAX_JOINED][CHANNEL_MAX];
     char *active_channel = (char*)malloc(CHANNEL_MAX * sizeof(char));
+    int joined_len = 1;
     strcpy(active_channel, "Common");
+    strcpy(joined_chnls[0], "Common");
     char c;
     int char_ind = 0;
     unsigned int len = sizeof(a->server);
@@ -94,7 +103,6 @@ void *send_thread(void *args){
         // Read stdin loop
         while (read(STDIN_FILENO, &c, 1) == 1 && c != '\n')
         {
-            
             writing = 1;
             pthread_cond_broadcast(&cond);
             buff[char_ind++] = c;
@@ -111,6 +119,10 @@ void *send_thread(void *args){
         {
         case REQ_JOIN:{ // Join request
             send_join_req(buff, a->socketfd, &a->server, len, active_channel);
+            char chnl[CHANNEL_MAX];
+            int chnl_len;
+            strcpy(chnl, get_command_arg(buff, &chnl_len));
+            strncpy(joined_chnls[joined_len++], chnl, CHANNEL_MAX);
         }break;
         case REQ_SAY:{ // Say request
             send_say_req(a->socketfd, &a->server, len, active_channel, buff);
@@ -120,10 +132,23 @@ void *send_thread(void *args){
         }break;
         case REQ_WHO:{
             send_who_req(a->socketfd, &a->server, len, buff);
-
         }break;
         case REQ_LEAVE: {
-            send_leave_req(a->socketfd, &a->server, len, buff, active_channel);
+            char chnl[CHANNEL_MAX];
+            int chnl_len;
+            strcpy(chnl, get_command_arg(buff, &chnl_len));
+            void *leave_chnl = remove_shift((void **)joined_chnls, &joined_len, cmp, (void *)chnl);
+            if (leave_chnl == NULL)
+            {
+                clear_stdout(50);
+                write(STDOUT_FILENO, "You have not already join ", 26);
+                write(STDOUT_FILENO, (char *)leave_chnl, CHANNEL_MAX);
+                write(STDOUT_FILENO, " to leave it", 12);
+
+            }else{
+                send_leave_req(a->socketfd, &a->server, len, buff, active_channel);
+            }
+            
         }break;
         case REQ_SWITCH:{
             int chnl_len;
@@ -131,11 +156,6 @@ void *send_thread(void *args){
             strncpy(active_channel, chnl, chnl_len);
         }break;
         case REQ_LOGOUT:{
-            /*struct request_logout req_lg;
-            req_lg.req_type = REQ_LOGOUT;
-            if(sendto(a->socketfd, &req_lg, sizeof(req_lg), 0, (struct sockaddr *)&a->server, len) < 0){
-                write(STDOUT_FILENO, "Could not send logout reqeust\n", 30);
-            }*/
             send_logout_req(a->socketfd, &a->server, len);
             free(buff);
             free(active_channel);
@@ -155,7 +175,7 @@ void *send_thread(void *args){
             pthread_mutex_unlock(&lock);
         }
     }
-    
+    write(STDOUT_FILENO, "\n", 1); 
     return NULL;
 }
 

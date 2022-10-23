@@ -232,3 +232,26 @@ Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
     return chnl;
 
 }
+
+void *remove_shift(void *list[], int *list_len, int (*cmp)(void *, void*), void *search){
+    int move = 0;
+    void *ret = NULL;
+    for (int i = 0; i < *list_len; i++)
+    {
+        if (move)
+        {
+            list[i-1] = list[i];
+            list[i] = NULL;
+        }else if (cmp(list[i], search))
+        {
+            move = 1;
+            ret = list[i];
+            list[i] = NULL;
+        }
+    }
+    if (move)
+    {
+        *list_len -= 1;
+    }
+    return ret;
+}
