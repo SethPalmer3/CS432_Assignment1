@@ -51,10 +51,7 @@ char *get_command_arg(char *buf, int *chnl_len){
         if (chnl_start == -1)
         {
             chnl_start = i + 1;
-        }else{
-            break;
         }
-        
       }
       i++;
     }
