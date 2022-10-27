@@ -35,7 +35,10 @@ int main(int argc, char **argv){
 
     memset(&client_addr, 0, sizeof(client_addr));
 
-    ch->init_socket(ch, argv[1], (uint16_t)atoi(argv[2]));
+    if(!ch->init_socket(ch, argv[1], (uint16_t)atoi(argv[2]))){
+        ch->destroy(ch);
+        exit(EXIT_FAILURE);
+    }
 
     struct request *rq;
 
@@ -114,7 +117,7 @@ int main(int argc, char **argv){
                 struct text_error te;
                 memset(&te, 0, sizeof(te));
                 te.txt_type = TXT_ERROR;
-                strcpy(te.txt_error, "Channel \"");
+                strcpy(te.txt_error, "Error: Channel \"");
                 strcat(te.txt_error, re_who->req_channel);
                 strcat(te.txt_error, "\" does not exist");
                 ch->socket_send(ch, &te, sizeof(te), &client_addr);
@@ -136,12 +139,7 @@ int main(int argc, char **argv){
             {
                 // Send Error report
                 printf("Not a real channel\n");
-                struct text_error terr;
-                memset(&terr, 0, sizeof(terr));
-                terr.txt_type = TXT_ERROR;
-                strcpy(terr.txt_error, "The channel \"");
-                strcat(terr.txt_error, req_l->req_channel);
-                strcat(terr.txt_error, "\" does not exist");
+                struct text_error terr = fill_error(req_l->req_channel);
                 ch->socket_send(ch, &terr, sizeof(terr), &client_addr);
                 continue;
             }

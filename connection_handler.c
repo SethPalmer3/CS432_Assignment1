@@ -11,14 +11,14 @@
 #include <fcntl.h>
 
 
-void init_socket(Connection_Handler* ch, char *addr, uint16_t port){
+int init_socket(Connection_Handler* ch, char *addr, uint16_t port){
     Self *s = (Self *)ch->self;
     if((s->socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
         printf("Could not create socket\n");
     }
     if (port == 0)
     {
-        return;
+        return 0;
     }
     
     
@@ -42,16 +42,17 @@ void init_socket(Connection_Handler* ch, char *addr, uint16_t port){
     int bind_err;
     // Bind address to the socket
     if((bind_err = bind(s->socket_fd, (struct sockaddr*)&(s->addr), s->addrlen)) < 0){
-        printf("Cannot bind create socket: %d\n", bind_err);
+        printf("Cannot bind created socket: %d\n", bind_err);
+        return 0;
     }
     unsigned int namelen = sizeof(s->addr);
     if (getsockname(s->socket_fd, (struct sockaddr *) &s->addr, &namelen) < 0)
     {
         printf("getsockname()");
-        exit(3);
+        return 0;
     }
     printf("Port assigned is %d\n", ntohs(s->addr.sin_port));
-
+    return 1;
 }
 
 int socket_listen(Connection_Handler *ch, int max_connections){

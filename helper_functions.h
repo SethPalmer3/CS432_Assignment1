@@ -55,5 +55,6 @@ Channel *add_chnl(Channel **chnls, int *num_chnls, char *chnl_name);
 // Removes a channel from a list of channels
 Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name);
 
-
+// Given the channel name, return a filled error structure to send
+struct text_error fill_error(char *chnl_name);
 #endif

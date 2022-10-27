@@ -230,3 +230,11 @@ Channel *remove_chnl(Channel **chnls, int *num_chnls, char *chnl_name){
     return chnl;
 
 }
+
+struct text_error fill_error(char *chnl_name){
+    struct text_error t;
+    memset(&t, 0, sizeof(t));
+    t.txt_type = TXT_ERROR;
+    sprintf(t.txt_error, "Error: Cannot find channel: %s", chnl_name);
+    return t;
+}

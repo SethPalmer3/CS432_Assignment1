@@ -19,7 +19,7 @@ typedef struct self{
 typedef struct connection_handler
 {
     void *self;
-    void (*init_socket)(struct connection_handler* cnnct_hndlr, char *addr, uint16_t prt);
+    int (*init_socket)(struct connection_handler* cnnct_hndlr, char *addr, uint16_t prt);
     int (*socket_listen)(struct connection_handler* cnnct_hndlr, int mx_cnncts);
     int (*socket_accept)(struct connection_handler*, struct sockaddr_in *client_addr, int *client_addrlen);
     int (*socket_connect)(struct connection_handler*, char *server_name, uint16_t port, struct sockaddr_in* s_addr, socklen_t *len);

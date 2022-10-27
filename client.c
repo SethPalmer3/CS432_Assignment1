@@ -159,9 +159,9 @@ void *send_thread(void *args){
             if (move == 0)
             {
                 clear_stdout(50);
-                write(STDOUT_FILENO, "You have not already join ", 26);
-                write(STDOUT_FILENO, (char *)chnl, CHANNEL_MAX);
-                write(STDOUT_FILENO, " to leave it", 12);
+                write(STDOUT_FILENO, "Error: cannot find channel: ", 28);
+                write(STDOUT_FILENO, chnl, CHANNEL_MAX);
+                write(STDOUT_FILENO, "\n", 1);
 
             }else{
                 send_leave_req(a->socketfd, &a->server, len, buff, active_channel);
