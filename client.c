@@ -122,7 +122,11 @@ void *send_thread(void *args){
             char chnl[CHANNEL_MAX];
             int chnl_len;
             strcpy(chnl, get_command_arg(buff, &chnl_len));
-            strncpy(joined_chnls[joined_len++], chnl, CHANNEL_MAX);
+            if (chnl_len > 0)
+            {
+                strncpy(joined_chnls[joined_len++], chnl, CHANNEL_MAX);
+            }
+            
         }break;
         case REQ_SAY:{ // Say request
             send_say_req(a->socketfd, &a->server, len, active_channel, buff);
@@ -137,6 +141,12 @@ void *send_thread(void *args){
             char chnl[CHANNEL_MAX];
             int chnl_len;
             strcpy(chnl, get_command_arg(buff, &chnl_len));
+            if (chnl_len == 0)
+            {
+                write(STDOUT_FILENO, "Not enough arguments\n", 20);
+                continue;
+            }
+            
             int move = 0;
             char leave_chnl[CHANNEL_MAX];
             int i;
@@ -171,6 +181,12 @@ void *send_thread(void *args){
         case REQ_SWITCH:{
             int chnl_len;
             char *chnl = get_command_arg(buff, &chnl_len);
+            if (chnl_len == 0)
+            {
+                write(STDOUT_FILENO, "Not enough arguments\n", 20);
+                continue;
+            }
+            
             int found = 0;
             for (int i = 0; i < joined_len; i++)
             {
@@ -197,7 +213,8 @@ void *send_thread(void *args){
             pthread_cond_broadcast(&cond);
         }break;
         default:
-            write(STDOUT_FILENO, "Something went terribly wrong\n", 30);
+            clear_stdout(50);
+            write(STDOUT_FILENO, "Something went terribly wrong", 29);
             break;
         }
         if (!logout)

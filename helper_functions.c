@@ -55,7 +55,13 @@ char *get_command_arg(char *buf, int *chnl_len){
       }
       i++;
     }
-    *chnl_len = i - chnl_start;
+    if (chnl_start < 0)
+    {
+        *chnl_len = 0;
+    }else{
+        *chnl_len = i - chnl_start-1;
+    }
+
     return chnl_start + buf;
 }
 
@@ -95,6 +101,12 @@ int send_join_req(char *buff, int socketfd, struct sockaddr_in *server_addr, int
     memset(&req_jn, 0, sizeof(req_jn));
     int chnl_len;
     char *chnl = get_command_arg(buff, &chnl_len);
+    if (chnl_len == 0)
+    {
+        clear_stdout(50);
+        write(STDOUT_FILENO, "Not enough arguments\n", 20);
+        return 0;
+    }
     strncpy(req_jn.req_channel, chnl, chnl_len);
     req_jn.req_type = REQ_JOIN;
 
@@ -114,6 +126,7 @@ int send_say_req(int socketfd, struct sockaddr_in *s_addr, int len, char *active
     strcpy(rs.req_text, buff);
     
     if(sendto(socketfd, &rs, sizeof(rs), 0, (struct sockaddr *)s_addr, len) < 0){
+        clear_stdout(50);
         write(STDOUT_FILENO, "Could not send say request\n", 28);
         return 0;
     }
@@ -125,6 +138,7 @@ int send_list_req(int socketfd, struct sockaddr_in *s_addr, int len){
     memset(&rl, 0, sizeof(rl));
     rl.req_type = REQ_LIST;
     if(sendto(socketfd, &rl, sizeof(rl), 0, (struct sockaddr *)s_addr, len) < 0){
+        clear_stdout(50);
         write(STDOUT_FILENO, "Could not send list request\n", 28);
         return 0;
     }
@@ -134,11 +148,18 @@ int send_list_req(int socketfd, struct sockaddr_in *s_addr, int len){
 int send_who_req(int socketfd, struct sockaddr_in *s_addr, int len, char *buff){
     int chnl_len;
     char *chnl_name = get_command_arg(buff, &chnl_len);
+    if (chnl_len == 0)
+    {
+        clear_stdout(50);
+        write(STDOUT_FILENO, "Not enough arguments\n", 20);
+        return 0;
+    }
     struct request_who re_who;
     memset(&re_who, 0, sizeof(re_who));
     re_who.req_type = REQ_WHO;
     strncpy(re_who.req_channel, chnl_name, chnl_len);
     if(sendto(socketfd, &re_who, sizeof(re_who), 0, (struct sockaddr *)s_addr, len) < 0){
+        clear_stdout(50);
         write(STDOUT_FILENO, "Could not send who request\n", 28);
         return 0;
     }
@@ -151,6 +172,13 @@ int send_leave_req(int socketfd, struct sockaddr_in *s_addr, int len, char *buff
     req_l.req_type = REQ_LEAVE;
     int chnl_len;
     char *chnl = get_command_arg(buff, &chnl_len);
+    if (chnl_len == 0)
+    {
+        clear_stdout(50);
+        write(STDOUT_FILENO, "Not enough arguments\n", 20);
+        return 0;
+    }
+    
     strncpy(req_l.req_channel, chnl, chnl_len);
     if (strncmp(active_channel, chnl, chnl_len) == 0)
     {
@@ -158,6 +186,7 @@ int send_leave_req(int socketfd, struct sockaddr_in *s_addr, int len, char *buff
     }
     
     if(sendto(socketfd, &req_l, sizeof(req_l), 0, (struct sockaddr *)s_addr, len) < 0){
+        clear_stdout(50);
         write(STDOUT_FILENO, "Could not send who request\n", 28);
         return 0;
     }
@@ -169,6 +198,7 @@ int send_logout_req(int socketfd, struct sockaddr_in *s_addr, int len){
     memset(&req_lg, 0, sizeof(req_lg));
     req_lg.req_type = REQ_LOGOUT;
     if(sendto(socketfd, &req_lg, sizeof(req_lg), 0, (struct sockaddr *)s_addr, len) < 0){
+        clear_stdout(50);
         write(STDOUT_FILENO, "Could not send logout reqeust\n", 30);
         return 0;
     }

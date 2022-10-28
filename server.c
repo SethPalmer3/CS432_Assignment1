@@ -90,7 +90,6 @@ int main(int argc, char **argv){
             new_chnl->add_user(new_chnl, usr); // Add user to channel
         }break;
         case REQ_LIST:{
-
             int re_len = sizeof(struct text_list) + (num_chnnls * sizeof(struct channel_info));
             struct text_list *re_l = (struct text_list *)malloc(re_len);
             re_l->txt_type = TXT_LIST;
