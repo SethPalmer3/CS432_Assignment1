@@ -59,7 +59,7 @@ char *get_command_arg(char *buf, int *chnl_len){
     {
         *chnl_len = 0;
     }else{
-        *chnl_len = i - chnl_start-1;
+        *chnl_len = i - chnl_start;
     }
 
     return chnl_start + buf;

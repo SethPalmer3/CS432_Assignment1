@@ -62,6 +62,12 @@ int main(int argc, char **argv){
         case REQ_SAY:{ // Say request
             struct request_say *re_say = (struct request_say *)rq;
             Channel *active_ch = find_channel(channels, num_chnnls,re_say->req_channel);
+            if (active_ch == NULL)
+            {
+                struct text_error chnl_err = fill_error(re_say->req_channel);
+                ch->socket_send(ch, &chnl_err, sizeof(chnl_err), &(client_addr));
+            }
+            
             for (int i = 0; i < active_ch->num_users; i++)
             {
                 struct text_say ts;
@@ -78,7 +84,6 @@ int main(int argc, char **argv){
         }
         break;
         case REQ_JOIN: { // Join request
-            //TODO: fix join and switch problems
             struct request_join *re_j = (struct request_join*)rq;
             Channel *new_chnl = find_channel(channels, num_chnnls, re_j->req_channel);
             if (new_chnl == NULL)

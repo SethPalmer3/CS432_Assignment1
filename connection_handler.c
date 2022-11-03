@@ -29,7 +29,6 @@ int init_socket(Connection_Handler* ch, char *addr, uint16_t port){
     s->addr.sin_family = AF_INET;
     if (addr == NULL)
     {
-        /* code */
         s->addr.sin_addr.s_addr = htonl(INADDR_ANY);
     }else{
         inet_pton(AF_INET, addr, &(s->addr.sin_addr));
