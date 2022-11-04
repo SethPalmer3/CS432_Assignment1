@@ -56,6 +56,7 @@ int main(int argc, char **argv){
             struct request_login *rq_lg = (struct request_login *)rq;
             User *usr;
             usr = channels[0]->create_user(channels[0], rq_lg->req_username, &client_addr, client_addrlen);
+            channels[0]->remove_user(channels[0], usr->username);
             all_users[num_users++] = usr;
         }
             break;

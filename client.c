@@ -47,7 +47,6 @@ void *recv_thread(void *args){
                 {
                     continue;
                 }
-                    
             }
             clear_stdout(50); 
             
@@ -265,7 +264,11 @@ int main(int argc, char **argv){
     struct request_login req_lg;
     req_lg.req_type = REQ_LOGIN;
     strcpy(req_lg.req_username, usrname);
+    struct request_join req_jn;
+    req_jn.req_type = REQ_JOIN;
+    strcpy(req_jn.req_channel, "Common");
     c->socket_send(c, (void*)&req_lg, sizeof(req_lg), &server_addr);
+    c->socket_send(c, (void*)&req_jn, sizeof(req_jn), &server_addr);
 
     pthread_t recv_t;
     pthread_attr_t rect_attr;
